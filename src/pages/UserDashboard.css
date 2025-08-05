@@ -1,0 +1,103 @@
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  font-family: var(--font-family);
+}
+
+.sidebar {
+  width: 220px;
+  background-color: var(--secondary-color);
+  color: var(--text-light);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-title {
+  margin-bottom: 30px;
+  font-size: 20px;
+  color: var(--primary-color);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: var(--border-radius);
+  transition: 0.3s;
+}
+
+.sidebar li:hover {
+  background-color: var(--primary-color);
+}
+
+.menu-icon {
+  font-size: 18px;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 40px;
+  background-color: #f5f6fa;
+  overflow-y: auto;
+}
+
+
+/* Highlight active sidebar link */
+.sidebar ul li.active {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+/* Applications Table */
+.applications-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.applications-table th,
+.applications-table td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.applications-table th {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+}
+
+.applications-table tr:hover {
+  background-color: #f0f8ff;
+}
+
+
+.status.pending {
+  color: #f39c12;
+  font-weight: bold;
+}
+
+.status.approved {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.status.rejected {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+

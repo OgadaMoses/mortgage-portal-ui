@@ -1,0 +1,70 @@
+.loan-form-container {
+  background: #fff;
+  padding: 40px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.loan-form-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+
+.form-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 40px;
+  margin-bottom: 30px;
+}
+
+.upload-section {
+  grid-template-columns: 1fr;
+}
+
+
+.loan-form input[type="text"],
+.loan-form input[type="email"],
+.loan-form input[type="number"],
+.loan-form input[type="tel"],
+.loan-form select,
+.loan-form input[type="file"] {
+  padding: 12px;
+  border-radius: var(--border-radius);
+  border: 1px solid #F36F21;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.loan-form input:focus,
+.loan-form select:focus {
+  border-color: var(--secondary-color); /* HF Orange */
+  outline: none;
+}
+
+/* Button */
+.loan-form button {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.loan-form button:hover {
+  background-color: var(--secondary-color);
+}
+
+.file-name {
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  margin-top: 5px;
+}
+
+
