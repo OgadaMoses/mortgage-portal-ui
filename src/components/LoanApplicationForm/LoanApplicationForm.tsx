@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './LoanApplicationForm.css';
 
+
 export default function LoanApplicationForm() {
   const [file, setFile] = useState<File | null>(null);
 
@@ -8,7 +9,7 @@ export default function LoanApplicationForm() {
     const selectedFile = e.target.files?.[0] || null;
     if (selectedFile && selectedFile.size > 10 * 1024 * 1024) { // 10MB
       alert('File size exceeds 10MB limit.');
-      e.target.value = ''; // reset file
+      e.target.value = ''; 
       return;
     }
     setFile(selectedFile);

@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import Dashboard from './pages/UserDashboard';
-import AdminPanel from "./pages/AdminPanel";
+import LoginPage from './pages/LoginPage/LoginPage';
+import Dashboard from './pages/UserDashboard/UserDashboard';
+import AdminPanel from "./pages/AdminPanel/AdminPanel";
 
 export default function App() {
   return (

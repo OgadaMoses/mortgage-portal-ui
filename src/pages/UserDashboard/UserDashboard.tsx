@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './UserDashboard.css';
 import { FaFileAlt, FaPlusCircle } from 'react-icons/fa';
-import LoanApplicationForm from './LoanApplicationForm';
+import LoanApplicationForm from '../../components/LoanApplicationForm/LoanApplicationForm';
 
 interface LoanApplication {
   id: string;
