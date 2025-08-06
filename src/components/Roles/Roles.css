@@ -1,0 +1,54 @@
+.roles-container {
+  padding: 20px;
+  background: #fff;
+}
+
+.add-role-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.add-role-form input {
+  padding: 8px;
+  flex: 1;
+}
+
+.add-role-form button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+.roles-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.roles-table th,
+.roles-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.roles-table th {
+  background: #F36F21;
+  color: white;      
+  text-align: left;
+}
+
+.roles-table .delete-btn {
+  background: #dc3545;
+  color: white;
+  margin-left: 5px;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.empty {
+  text-align: center;
+  color: gray;
+}

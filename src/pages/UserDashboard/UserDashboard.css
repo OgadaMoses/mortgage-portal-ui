@@ -51,13 +51,12 @@
 }
 
 
-/* Highlight active sidebar link */
 .sidebar ul li.active {
   background-color: var(--secondary-color);
   color: white;
 }
 
-/* Applications Table */
+
 .applications-table {
   width: 100%;
   border-collapse: collapse;

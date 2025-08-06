@@ -1,0 +1,68 @@
+.admin-user-mapping-container {
+  padding: 20px;
+  background: #fff;
+}
+
+.dropdowns-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.dropdown {
+  flex: 0 0 45%;
+}
+
+.dropdown h3 {
+  margin-bottom: 8px;
+}
+
+.dropdown select {
+  width: 100%;
+  padding: 8px;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid #ddd;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.scrollable {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.assign-btn {
+  background: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.mapping-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mapping-table th,
+.mapping-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.mapping-table th {
+  background: #F36F21;
+  color: white;
+  text-align: left;
+}
+
+.empty {
+  text-align: center;
+  color: gray;
+}

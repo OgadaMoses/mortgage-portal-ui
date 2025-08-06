@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./AdminPanel.css";
-import { FaClock, FaCheckCircle } from "react-icons/fa";
+import RolesManager from "../../components/Roles/RolesManager";
+import MenuRoleMapping from "../../components/Modal/RolesMenuMappings/MenuRoleMapping";
+import AdminUserMapping from "../../components/AdminUserMapping/AdminUserMapping";
+import { FaClock, FaCheckCircle, FaUserShield, FaSitemap, FaUsersCog } from "react-icons/fa";
 
 interface LoanApplication {
   id: string;
@@ -23,10 +26,11 @@ export default function AdminPanel() {
   const [applications, setApplications] = useState<LoanApplication[]>([]);
   const [selectedApp, setSelectedApp] = useState<LoanApplication | null>(null);
   const [decisionReason, setDecisionReason] = useState("");
-  const [activePage, setActivePage] = useState<"pending" | "approved">("pending");
+  const [activePage, setActivePage] = useState<
+    "pending" | "approved" | "roles" | "menuRoles" | "adminMappings"
+  >("pending");
 
   useEffect(() => {
- 
     const mockData: LoanApplication[] = [
       {
         id: "APP001",
@@ -42,7 +46,7 @@ export default function AdminPanel() {
         tenure: 15,
         status: "Pending",
         submittedAt: "2025-08-01",
-        documents: ["id.pdf", "payslip.pdf"]
+        documents: ["id.pdf", "payslip.pdf"],
       },
       {
         id: "APP002",
@@ -58,8 +62,8 @@ export default function AdminPanel() {
         tenure: 10,
         status: "Approved",
         submittedAt: "2025-08-02",
-        documents: ["passport.pdf", "bankstatement.pdf"]
-      }
+        documents: ["passport.pdf", "bankstatement.pdf"],
+      },
     ];
     setApplications(mockData);
   }, []);
@@ -71,14 +75,12 @@ export default function AdminPanel() {
       return;
     }
 
-  
     setApplications((prev) =>
       prev.map((app) =>
         app.id === selectedApp.id ? { ...app, status } : app
       )
     );
 
-  
     setSelectedApp(null);
     setDecisionReason("");
     alert(`Application ${status}`);
@@ -91,7 +93,6 @@ export default function AdminPanel() {
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
       <aside className="sidebar">
         <h2 className="sidebar-title">Admin Portal</h2>
         <nav>
@@ -108,43 +109,71 @@ export default function AdminPanel() {
             >
               <FaCheckCircle className="menu-icon" /> Approved Items
             </li>
+            <li
+              className={activePage === "roles" ? "active" : ""}
+              onClick={() => setActivePage("roles")}
+            >
+              <FaUserShield className="menu-icon" /> Roles
+            </li>
+            <li
+              className={activePage === "menuRoles" ? "active" : ""}
+              onClick={() => setActivePage("menuRoles")}
+            >
+              <FaSitemap className="menu-icon" /> Menu Role Mappings
+            </li>
+            <li
+              className={activePage === "adminMappings" ? "active" : ""}
+              onClick={() => setActivePage("adminMappings")}
+            >
+              <FaUsersCog className="menu-icon" /> Admin User Mappings
+            </li>
           </ul>
         </nav>
       </aside>
-  
-      <main className="dashboard-content">
-        <h1>
-          {activePage === "pending" ? "Pending Approvals" : "Approved Applications"}
-        </h1>
 
-        <table className="applications-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Full Name</th>
-              <th>Loan Amount</th>
-              <th>Status</th>
-              <th>Submitted On</th>
-              {activePage === "pending" && <th>Action</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredApplications.map((app) => (
-              <tr key={app.id}>
-                <td>{app.id}</td>
-                <td>{app.fullName}</td>
-                <td>{app.amount.toLocaleString()}</td>
-                <td className={`status ${app.status.toLowerCase()}`}>{app.status}</td>
-                <td>{app.submittedAt}</td>
-                {activePage === "pending" && (
-                  <td>
-                    <button onClick={() => setSelectedApp(app)}>View</button>
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <main className="dashboard-content">
+        {activePage === "pending" || activePage === "approved" ? (
+          <>
+            <h1>
+              {activePage === "pending" ? "Pending Approvals" : "Approved Applications"}
+            </h1>
+
+            <table className="applications-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Full Name</th>
+                  <th>Loan Amount</th>
+                  <th>Status</th>
+                  <th>Submitted On</th>
+                  {activePage === "pending" && <th>Action</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredApplications.map((app) => (
+                  <tr key={app.id}>
+                    <td>{app.id}</td>
+                    <td>{app.fullName}</td>
+                    <td>{app.amount.toLocaleString()}</td>
+                    <td className={`status ${app.status.toLowerCase()}`}>{app.status}</td>
+                    <td>{app.submittedAt}</td>
+                    {activePage === "pending" && (
+                      <td>
+                        <button onClick={() => setSelectedApp(app)}>View</button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+          ) : activePage === "roles" ? (
+            <RolesManager />
+          ) : activePage === "menuRoles" ? (
+            <MenuRoleMapping />
+          ) : (
+            <AdminUserMapping />
+          )}
 
         {selectedApp && (
           <div className="modal">
