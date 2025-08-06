@@ -40,11 +40,11 @@
 
 .loan-form input:focus,
 .loan-form select:focus {
-  border-color: var(--secondary-color); /* HF Orange */
+  border-color: var(--secondary-color);
   outline: none;
 }
 
-/* Button */
+
 .loan-form button {
   width: 100%;
   padding: 14px;
