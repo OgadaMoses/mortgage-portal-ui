@@ -8,7 +8,7 @@ type LoginForm = {
 };
 
 export default function LoginPage() {
-  const { register, handleSubmit } = useForm<LoginForm>();
+  const { register, handleSubmit, reset } = useForm<LoginForm>();
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
@@ -18,9 +18,46 @@ export default function LoginPage() {
     phone: '',
     email: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const onSubmit = (data: LoginForm) => {
-    console.log("Login form submitted:", data);
+  const onSubmit = async (data: LoginForm) => {
+    setLoading(true);
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid username or password');
+      }
+
+      const result = await response.json();
+      console.log('Login successful:', result);
+
+      localStorage.setItem('authToken', result.token);
+      localStorage.setItem('role', result.role);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('lastLogin', new Date().toLocaleString());
+
+      if (result.role === '01') {
+        window.location.href = '/admin';
+      } else if (result.role === '02') {
+        window.location.href = '/userdashboard';
+      } else {
+        window.location.href = '/';
+      }
+
+      reset();
+    } catch (error: any) {
+      setErrorMessage(error.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePasswordReset = () => {
@@ -28,6 +65,7 @@ export default function LoginPage() {
     setShowForgotPassword(false);
     setEmail('');
   };
+
 
   const handleCreateAccount = () => {
     alert(`Thank you ${newUser.fullName}. Our Customer Service Team will contact you, or visit our nearest branch.`);
@@ -41,9 +79,13 @@ export default function LoginPage() {
         <h1 className="portal-title">Mortgage Application Portal</h1>
         <h2>Login</h2>
 
-        <input {...register('username')} placeholder="Username" />
-        <input type="password" {...register('password')} placeholder="Password" />
-        <button type="submit">Login</button>
+        <input {...register('username')} placeholder="Username" required />
+        <input type="password" {...register('password')} placeholder="Password" required />
+        <button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
 
         <div className="login-links">
           <span onClick={() => setShowForgotPassword(true)}>Forgot Password?</span>
@@ -94,7 +136,7 @@ export default function LoginPage() {
               value={newUser.email}
               onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
             />
-           <p className="info-text">
+            <p className="info-text">
               Our Customer Service Team will contact you for further details, or visit our nearest branch.
               <br />
               Email Us on: info@mortgageportal.com

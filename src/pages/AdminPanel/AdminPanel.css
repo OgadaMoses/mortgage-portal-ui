@@ -9,6 +9,40 @@
 }
 
 
+.top-bar {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  background-color: white;
+  padding: 10px 20px;
+  border-bottom: 2px solid var(--primary-color);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.user-info {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.logout-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #e74c3c;
+  padding: 6px 12px;
+  border-radius: 5px;
+  color: white;
+  transition: 0.3s;
+}
+
+.logout-icon:hover {
+  background-color: #c0392b;
+}
+
+
 .applications-table {
   width: 100%;
   border-collapse: collapse;

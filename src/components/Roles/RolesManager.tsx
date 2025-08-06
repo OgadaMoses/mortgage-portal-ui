@@ -58,7 +58,6 @@ export default function RolesManager() {
     <div className="roles-container">
       <h2>Roles Management</h2>
 
-      {/* Add Role Form */}
       <div className="add-role-form">
         <input
           type="text"

@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AdminPanel.css";
+
 import RolesManager from "../../components/Roles/RolesManager";
 import MenuRoleMapping from "../../components/Modal/RolesMenuMappings/MenuRoleMapping";
 import AdminUserMapping from "../../components/AdminUserMapping/AdminUserMapping";
-import { FaClock, FaCheckCircle, FaUserShield, FaSitemap, FaUsersCog } from "react-icons/fa";
+import AddUser from "../../components/AdminUserMapping/AddUser";
+
+import {
+  FaClock,
+  FaCheckCircle,
+  FaUserShield,
+  FaSitemap,
+  FaUsersCog,
+  FaUserPlus,
+} from "react-icons/fa";
 
 interface LoanApplication {
   id: string;
@@ -27,8 +38,10 @@ export default function AdminPanel() {
   const [selectedApp, setSelectedApp] = useState<LoanApplication | null>(null);
   const [decisionReason, setDecisionReason] = useState("");
   const [activePage, setActivePage] = useState<
-    "pending" | "approved" | "roles" | "menuRoles" | "adminMappings"
+    "pending" | "approved" | "roles" | "menuRoles" | "adminMappings" | "addUser"
   >("pending");
+
+  const username = localStorage.getItem("username") || "Admin";
 
   useEffect(() => {
     const mockData: LoanApplication[] = [
@@ -68,6 +81,7 @@ export default function AdminPanel() {
     setApplications(mockData);
   }, []);
 
+ 
   const handleDecision = (status: "Approved" | "Rejected") => {
     if (!selectedApp) return;
     if (!decisionReason && status === "Rejected") {
@@ -86,10 +100,18 @@ export default function AdminPanel() {
     alert(`Application ${status}`);
   };
 
+
   const filteredApplications =
     activePage === "pending"
       ? applications.filter((app) => app.status === "Pending")
       : applications.filter((app) => app.status === "Approved");
+
+
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
 
   return (
     <div className="dashboard-container">
@@ -127,15 +149,34 @@ export default function AdminPanel() {
             >
               <FaUsersCog className="menu-icon" /> Admin User Mappings
             </li>
+            <li
+              className={activePage === "addUser" ? "active" : ""}
+              onClick={() => setActivePage("addUser")}
+            >
+              <FaUserPlus className="menu-icon" /> Add User
+            </li>
           </ul>
         </nav>
       </aside>
 
       <main className="dashboard-content">
+        {/* Top Bar */}
+        <div className="top-bar">
+          <div className="user-info">
+            Logged in as <strong>{username}</strong> • Last login:{" "}
+            {new Date().toLocaleString()}
+          </div>
+          <button className="logout-icon" onClick={handleLogout}>
+            🔓 Logout
+          </button>
+        </div>
+
         {activePage === "pending" || activePage === "approved" ? (
           <>
             <h1>
-              {activePage === "pending" ? "Pending Approvals" : "Approved Applications"}
+              {activePage === "pending"
+                ? "Pending Approvals"
+                : "Approved Applications"}
             </h1>
 
             <table className="applications-table">
@@ -155,7 +196,9 @@ export default function AdminPanel() {
                     <td>{app.id}</td>
                     <td>{app.fullName}</td>
                     <td>{app.amount.toLocaleString()}</td>
-                    <td className={`status ${app.status.toLowerCase()}`}>{app.status}</td>
+                    <td className={`status ${app.status.toLowerCase()}`}>
+                      {app.status}
+                    </td>
                     <td>{app.submittedAt}</td>
                     {activePage === "pending" && (
                       <td>
@@ -167,14 +210,17 @@ export default function AdminPanel() {
               </tbody>
             </table>
           </>
-          ) : activePage === "roles" ? (
-            <RolesManager />
-          ) : activePage === "menuRoles" ? (
-            <MenuRoleMapping />
-          ) : (
-            <AdminUserMapping />
-          )}
+        ) : activePage === "roles" ? (
+          <RolesManager />
+        ) : activePage === "menuRoles" ? (
+          <MenuRoleMapping />
+        ) : activePage === "adminMappings" ? (
+          <AdminUserMapping />
+        ) : activePage === "addUser" ? (
+          <AddUser />
+        ) : null}
 
+        {/* Application Modal */}
         {selectedApp && (
           <div className="modal">
             <div className="modal-content">
