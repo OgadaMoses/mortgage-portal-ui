@@ -3,18 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import './UserDashboard.css';
 import { FaFileAlt, FaPlusCircle } from 'react-icons/fa';
 import LoanApplicationForm from '../../components/LoanApplicationForm/LoanApplicationForm';
+import axios from 'axios';
 
 interface LoanApplication {
-  id: string;
-  amount: number;
-  tenure: number;
-  status: string;
-  submittedAt: string;
+  loanappid: string;
+  loanamount: number;
+  loantenure: number;
+  loanstatus: string;
+  applicationdate: string;
 }
 
 export default function UserDashboard() {
   const [activePage, setActivePage] = useState<'myapps' | 'apply'>('myapps');
   const [applications, setApplications] = useState<LoanApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const username = localStorage.getItem('username') ?? 'User';
@@ -22,13 +25,28 @@ export default function UserDashboard() {
   const lastLogin = localStorage.getItem('lastLogin') ?? 'First time login';
 
   useEffect(() => {
-    const mockData: LoanApplication[] = [
-      { id: 'APP001', amount: 5000000, tenure: 15, status: 'Pending', submittedAt: '2025-08-01' },
-      { id: 'APP002', amount: 3500000, tenure: 10, status: 'Approved', submittedAt: '2025-08-02' },
-      { id: 'APP003', amount: 7500000, tenure: 20, status: 'Rejected', submittedAt: '2025-08-03' },
-    ];
-    setApplications(mockData);
-  }, []);
+    const fetchApplications = async () => {
+      try {
+        const response = await axios.get<LoanApplication[]>(
+          `http://localhost:8080/api/loans/my-applications`,
+          {
+            params: {
+              username,
+              useridentificationnumber: userId,
+            },
+          }
+        );
+        setApplications(response.data);
+      } catch (err) {
+        console.error('Failed to fetch loan applications:', err);
+        setError('Failed to load applications.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, [username, userId]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -71,30 +89,39 @@ export default function UserDashboard() {
         {activePage === 'myapps' && (
           <>
             <h1>My Applications</h1>
-            <table className="applications-table">
-              <thead>
-                <tr>
-                  <th>Application ID</th>
-                  <th>Loan Amount (KES)</th>
-                  <th>Tenure (Years)</th>
-                  <th>Status</th>
-                  <th>Submitted On</th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications.map((app) => (
-                  <tr key={app.id}>
-                    <td>{app.id}</td>
-                    <td>{app.amount.toLocaleString()}</td>
-                    <td>{app.tenure}</td>
-                    <td className={`status ${app.status.toLowerCase()}`}>{app.status}</td>
-                    <td>{app.submittedAt}</td>
+            {loading ? (
+              <p>Loading applications...</p>
+            ) : error ? (
+              <p className="error">{error}</p>
+            ) : applications.length === 0 ? (
+              <p>No applications found.</p>
+            ) : (
+              <table className="applications-table">
+                <thead>
+                  <tr>
+                    <th>Application ID</th>
+                    <th>Loan Amount (KES)</th>
+                    <th>Tenure (Years)</th>
+                    <th>Status</th>
+                    <th>Submitted On</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {applications.map((app) => (
+                    <tr key={app.loanappid}>
+                      <td>{app.loanappid}</td>
+                      <td>{app.loanamount.toLocaleString()}</td>
+                      <td>{app.loantenure}</td>
+                      <td className={`status ${app.loanstatus.toLowerCase()}`}>{app.loanstatus}</td>
+                      <td>{new Date(app.applicationdate).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </>
         )}
+
         {activePage === 'apply' && <LoanApplicationForm />}
       </main>
     </div>

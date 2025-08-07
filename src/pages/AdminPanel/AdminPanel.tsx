@@ -17,21 +17,23 @@ import {
 } from "react-icons/fa";
 
 interface LoanApplication {
-  id: string;
-  fullName: string;
+  loanappid: string;
+  fullnames: string;
   email: string;
-  phone: string;
-  nationalId: string;
+  phonenumber: string;
+  idpassportnumber: string;
   nationality: string;
-  countryOfResidence: string;
-  county: string;
-  income: number;
-  amount: number;
-  tenure: number;
-  status: string;
-  submittedAt: string;
-  documents: string[];
+  countryresidence: string;
+  countyresidence: string;
+  netmonthlyincome: number;
+  loanamount: number;
+  loantenure: number;
+  documenturls: string[];
+  loanstatus: string;
+  applicationdate: string;
+  [key: string]: any; // optional if there are extra fields
 }
+
 
 export default function AdminPanel() {
   const [applications, setApplications] = useState<LoanApplication[]>([]);
@@ -42,46 +44,50 @@ export default function AdminPanel() {
   >("pending");
 
   const username = localStorage.getItem("username") || "Admin";
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const mockData: LoanApplication[] = [
-      {
-        id: "APP001",
-        fullName: "John Doe",
-        email: "john@example.com",
-        phone: "+254712345678",
-        nationalId: "12345678",
-        nationality: "Kenyan",
-        countryOfResidence: "Kenya",
-        county: "Nairobi",
-        income: 150000,
-        amount: 5000000,
-        tenure: 15,
-        status: "Pending",
-        submittedAt: "2025-08-01",
-        documents: ["id.pdf", "payslip.pdf"],
-      },
-      {
-        id: "APP002",
-        fullName: "Jane Smith",
-        email: "jane@example.com",
-        phone: "+254711111111",
-        nationalId: "23456789",
-        nationality: "Kenyan",
-        countryOfResidence: "Kenya",
-        county: "Mombasa",
-        income: 200000,
-        amount: 3500000,
-        tenure: 10,
-        status: "Approved",
-        submittedAt: "2025-08-02",
-        documents: ["passport.pdf", "bankstatement.pdf"],
-      },
-    ];
-    setApplications(mockData);
-  }, []);
+    const fetchApplications = async () => {
+      try {
+        const status = activePage === "pending" ? "PENDING" : "APPROVED";
+        const res = await fetch(`http://localhost:8080/api/loans/status?status=${status}`);
+        if (!res.ok) throw new Error("Failed to fetch applications");
 
- 
+        const data = await res.json();
+
+        const transformed: LoanApplication[] = data.map((app: any) => ({
+          id: app.loanappid,
+          fullName: app.fullnames,
+          email: app.email,
+          phone: app.phonenumber,
+          nationalId: app.useridentificationnumber,
+          nationality: app.nationality,
+          countryOfResidence: app.countryresidence,
+          county: app.countyresidence,
+          income: app.netmonthlyincome,
+          amount: app.loanamount,
+          tenure: app.loantenure,
+          status: app.loanstatus,
+          submittedAt: app.applicationdate,
+          documents: app.documents || [],
+        }));
+
+        setApplications(transformed);
+      } catch (error) {
+        console.error("Error loading applications:", error);
+      }
+    };
+
+    if (activePage === "pending" || activePage === "approved") {
+      fetchApplications();
+    }
+  }, [activePage]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   const handleDecision = (status: "Approved" | "Rejected") => {
     if (!selectedApp) return;
     if (!decisionReason && status === "Rejected") {
@@ -90,9 +96,7 @@ export default function AdminPanel() {
     }
 
     setApplications((prev) =>
-      prev.map((app) =>
-        app.id === selectedApp.id ? { ...app, status } : app
-      )
+      prev.map((app) => (app.id === selectedApp.id ? { ...app, status } : app))
     );
 
     setSelectedApp(null);
@@ -100,18 +104,7 @@ export default function AdminPanel() {
     alert(`Application ${status}`);
   };
 
-
-  const filteredApplications =
-    activePage === "pending"
-      ? applications.filter((app) => app.status === "Pending")
-      : applications.filter((app) => app.status === "Approved");
-
-
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+  const filteredApplications = applications;
 
   return (
     <div className="dashboard-container">
@@ -130,7 +123,7 @@ export default function AdminPanel() {
               onClick={() => setActivePage("approved")}
             >
               <FaCheckCircle className="menu-icon" /> Approved Items
-            </li>        
+            </li>
             <li
               className={activePage === "addUser" ? "active" : ""}
               onClick={() => setActivePage("addUser")}
@@ -142,11 +135,9 @@ export default function AdminPanel() {
       </aside>
 
       <main className="dashboard-content">
-        {/* Top Bar */}
         <div className="top-bar">
           <div className="user-info">
-            Logged in as <strong>{username}</strong> • Last login:{" "}
-            {new Date().toLocaleString()}
+            Logged in as <strong>{username}</strong> • Last login: {new Date().toLocaleString()}
           </div>
           <button className="logout-icon" onClick={handleLogout}>
             🔓 Logout
@@ -156,11 +147,8 @@ export default function AdminPanel() {
         {activePage === "pending" || activePage === "approved" ? (
           <>
             <h1>
-              {activePage === "pending"
-                ? "Pending Approvals"
-                : "Approved Applications"}
+              {activePage === "pending" ? "Pending Approvals" : "Approved Applications"}
             </h1>
-
             <table className="applications-table">
               <thead>
                 <tr>
@@ -178,10 +166,8 @@ export default function AdminPanel() {
                     <td>{app.id}</td>
                     <td>{app.fullName}</td>
                     <td>{app.amount.toLocaleString()}</td>
-                    <td className={`status ${app.status.toLowerCase()}`}>
-                      {app.status}
-                    </td>
-                    <td>{app.submittedAt}</td>
+                    <td className={`status ${app.status.toLowerCase()}`}>{app.status}</td>
+                    <td>{new Date(app.submittedAt).toLocaleDateString()}</td>
                     {activePage === "pending" && (
                       <td>
                         <button onClick={() => setSelectedApp(app)}>View</button>
@@ -202,43 +188,44 @@ export default function AdminPanel() {
           <AddUser />
         ) : null}
 
-        {/* Application Modal */}
-        {selectedApp && (
-          <div className="modal">
-            <div className="modal-content">
-              <h2>Application Details ({selectedApp.id})</h2>
-              <p><strong>Full Name:</strong> {selectedApp.fullName}</p>
-              <p><strong>Email:</strong> {selectedApp.email}</p>
-              <p><strong>Phone:</strong> {selectedApp.phone}</p>
-              <p><strong>National ID / Passport:</strong> {selectedApp.nationalId}</p>
-              <p><strong>Nationality:</strong> {selectedApp.nationality}</p>
-              <p><strong>Country of Residence:</strong> {selectedApp.countryOfResidence}</p>
-              <p><strong>County:</strong> {selectedApp.county}</p>
-              <p><strong>Income:</strong> {selectedApp.income.toLocaleString()} KES</p>
-              <p><strong>Loan Amount:</strong> {selectedApp.amount.toLocaleString()} KES</p>
-              <p><strong>Tenure:</strong> {selectedApp.tenure} years</p>
-              <p><strong>Documents:</strong> {selectedApp.documents.join(", ")}</p>
+        {/* Modal */}
+          {selectedApp && (
+  <div className="modal">
+    <div className="modal-content">
+      <h2>Application Details ({selectedApp.id})</h2>
+      <p><strong>Full Name:</strong> {selectedApp.fullName}</p>
+      <p><strong>Email:</strong> {selectedApp.email}</p>
+      <p><strong>Phone:</strong> {selectedApp.phone}</p>
+      <p><strong>National ID / Passport:</strong> {selectedApp.nationalId}</p>
+      <p><strong>Nationality:</strong> {selectedApp.nationality}</p>
+      <p><strong>Country of Residence:</strong> {selectedApp.countryOfResidence}</p>
+      <p><strong>County:</strong> {selectedApp.county}</p>
+      <p><strong>Income:</strong> KES {selectedApp.income?.toLocaleString?.() || "N/A"}</p>
+      <p><strong>Loan Amount:</strong> KES {selectedApp.amount?.toLocaleString?.() || "N/A"}</p>
+      <p><strong>Tenure:</strong> {selectedApp.tenure || "N/A"} years</p>
+      <p><strong>Documents:</strong> {selectedApp.documents?.join(", ") || "None"}</p>
 
-              <textarea
-                placeholder="Reason (required if rejecting)"
-                value={decisionReason}
-                onChange={(e) => setDecisionReason(e.target.value)}
-              />
+      <textarea
+        placeholder="Reason (required if rejecting)"
+        value={decisionReason}
+        onChange={(e) => setDecisionReason(e.target.value)}
+      />
 
-              <div className="modal-actions">
-                <button className="approve" onClick={() => handleDecision("Approved")}>
-                  Approve
-                </button>
-                <button className="reject" onClick={() => handleDecision("Rejected")}>
-                  Reject
-                </button>
-                <button className="close" onClick={() => setSelectedApp(null)}>
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="modal-actions">
+        <button className="approve" onClick={() => handleDecision("Approved")}>
+          Approve
+        </button>
+        <button className="reject" onClick={() => handleDecision("Rejected")}>
+          Reject
+        </button>
+        <button className="close" onClick={() => setSelectedApp(null)}>
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       </main>
     </div>
   );
