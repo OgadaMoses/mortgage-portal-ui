@@ -1,84 +1,57 @@
-import React, { useState } from "react";
-import "./AdminUserMapping.css";
-
-interface Admin {
-  id: string;
-  name: string;
-}
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import './AdminUserMapping.css';
 
 interface User {
-  id: string;
-  name: string;
+  idxno: number;
+  username: string;
+  useridentificationnumber: string;
+  roleid: string;
 }
 
-interface Mapping {
-  adminName: string;
-  users: string[];
-}
+const AdminUserMapping: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [admins, setAdmins] = useState<User[]>([]);
+  const [usersOnly, setUsersOnly] = useState<User[]>([]);
+  const [selectedAdminId, setSelectedAdminId] = useState('');
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
-export default function AdminUserMapping() {
-  const [admins] = useState<Admin[]>([
-    { id: "ADM001", name: "Alice Admin" },
-    { id: "ADM002", name: "Bob Admin" },
-  ]);
+  useEffect(() => {
+    axios
+      .get('http://localhost:8080/api/users/all')
+      .then((res) => {
+        setUsers(res.data);
+        const admins = res.data.filter((u: User) => u.roleid === '01');
+        const users = res.data.filter((u: User) => u.roleid === '02');
+        setAdmins(admins);
+        setUsersOnly(users);
+      })
+      .catch((err) => {
+        console.error('Error fetching users', err);
+      });
+  }, []);
 
-  const [users] = useState<User[]>([
-    { id: "USR001", name: "John Doe" },
-    { id: "USR002", name: "Jane Smith" },
-    { id: "USR003", name: "Michael Kim" },
-    { id: "USR004", name: "Sarah Wang" },
-    { id: "USR005", name: "David Otieno" },
-    { id: "USR006", name: "Amina Yusuf" },
-  ]);
-
-  const [selectedAdmin, setSelectedAdmin] = useState<string | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [mappings, setMappings] = useState<Mapping[]>([]);
-
-  const toggleUser = (userId: string) => {
-    setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((u) => u !== userId)
-        : [...prev, userId]
-    );
+  const handleAssign = () => {
+    console.log('Assigning users:', selectedUserIds, 'to Admin:', selectedAdminId);
+    // You'll implement the API call here later
   };
 
-  const assignUsers = () => {
-    if (!selectedAdmin || selectedUsers.length === 0) {
-      alert("Please select an admin and at least one user.");
-      return;
-    }
-
-    const adminName = admins.find((a) => a.id === selectedAdmin)?.name || "";
-
-    const newMapping: Mapping = {
-      adminName,
-      users: selectedUsers.map(
-        (userId) => users.find((u) => u.id === userId)?.name || ""
-      ),
-    };
-
-    setMappings([...mappings, newMapping]);
-
-    setSelectedAdmin(null);
-    setSelectedUsers([]);
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUserIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
   };
 
   return (
     <div className="admin-user-mapping-container">
-      <h2>Admin User Mapping</h2>
-
       <div className="dropdowns-section">
         <div className="dropdown">
           <h3>Select Admin</h3>
-          <select
-            value={selectedAdmin || ""}
-            onChange={(e) => setSelectedAdmin(e.target.value || null)}
-          >
+          <select value={selectedAdminId} onChange={(e) => setSelectedAdminId(e.target.value)}>
             <option value="">-- Select Admin --</option>
             {admins.map((admin) => (
-              <option key={admin.id} value={admin.id}>
-                {admin.name}
+              <option key={admin.idxno} value={admin.useridentificationnumber}>
+                {admin.username} ({admin.useridentificationnumber})
               </option>
             ))}
           </select>
@@ -87,21 +60,21 @@ export default function AdminUserMapping() {
         <div className="dropdown">
           <h3>Select Users</h3>
           <div className="checkbox-list scrollable">
-            {users.map((user) => (
-              <label key={user.id}>
+            {usersOnly.map((user) => (
+              <label key={user.idxno}>
                 <input
                   type="checkbox"
-                  checked={selectedUsers.includes(user.id)}
-                  onChange={() => toggleUser(user.id)}
+                  checked={selectedUserIds.includes(user.useridentificationnumber)}
+                  onChange={() => toggleUserSelection(user.useridentificationnumber)}
                 />
-                {user.name}
+                {user.username} ({user.useridentificationnumber})
               </label>
             ))}
           </div>
         </div>
       </div>
 
-      <button className="assign-btn" onClick={assignUsers}>
+      <button className="assign-btn" onClick={handleAssign} disabled={!selectedAdminId || selectedUserIds.length === 0}>
         Assign Users to Admin
       </button>
 
@@ -113,21 +86,20 @@ export default function AdminUserMapping() {
           </tr>
         </thead>
         <tbody>
-          {mappings.map((mapping, index) => (
-            <tr key={index}>
-              <td>{mapping.adminName}</td>
-              <td>{mapping.users.join(", ")}</td>
-            </tr>
-          ))}
-          {mappings.length === 0 && (
+          {selectedAdminId && selectedUserIds.length > 0 ? (
             <tr>
-              <td colSpan={2} className="empty">
-                No mappings yet.
-              </td>
+              <td>{selectedAdminId}</td>
+              <td>{selectedUserIds.join(', ')}</td>
+            </tr>
+          ) : (
+            <tr>
+              <td colSpan={2} className="empty">No mappings to display.</td>
             </tr>
           )}
         </tbody>
       </table>
     </div>
   );
-}
+};
+
+export default AdminUserMapping;

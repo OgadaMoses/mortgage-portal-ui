@@ -7,19 +7,20 @@ type LoginForm = {
   password: string;
 };
 
+type NewUser = {
+  fullName: string;
+  phone: string;
+  email: string;
+};
+
 export default function LoginPage() {
   const { register, handleSubmit, reset } = useForm<LoginForm>();
-
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [email, setEmail] = useState('');
-  const [newUser, setNewUser] = useState({
-    fullName: '',
-    phone: '',
-    email: '',
-  });
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [newUser, setNewUser] = useState<NewUser>({ fullName: '', phone: '', email: '' });
 
   const onSubmit = async (data: LoginForm) => {
     setLoading(true);
@@ -39,11 +40,14 @@ export default function LoginPage() {
       const result = await response.json();
       console.log('Login successful:', result);
 
+      // Store all relevant data
       localStorage.setItem('authToken', result.token);
       localStorage.setItem('role', result.role);
-      localStorage.setItem('username', data.username);
+      localStorage.setItem('username', result.username);
+      localStorage.setItem('useridentificationnumber', result.useridentificationnumber);
       localStorage.setItem('lastLogin', new Date().toLocaleString());
 
+      // Redirect based on role
       if (result.role === '01') {
         window.location.href = '/admin';
       } else if (result.role === '02') {
@@ -66,7 +70,6 @@ export default function LoginPage() {
     setEmail('');
   };
 
-
   const handleCreateAccount = () => {
     alert(`Thank you ${newUser.fullName}. Our Customer Service Team will contact you, or visit our nearest branch.`);
     setShowCreateAccount(false);
@@ -81,6 +84,7 @@ export default function LoginPage() {
 
         <input {...register('username')} placeholder="Username" required />
         <input type="password" {...register('password')} placeholder="Password" required />
+
         <button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
@@ -93,6 +97,7 @@ export default function LoginPage() {
         </div>
       </form>
 
+      {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div className="modal">
           <div className="modal-content">
@@ -106,14 +111,13 @@ export default function LoginPage() {
             />
             <div className="modal-actions">
               <button onClick={handlePasswordReset}>Submit</button>
-              <button className="close" onClick={() => setShowForgotPassword(false)}>
-                Close
-              </button>
+              <button className="close" onClick={() => setShowForgotPassword(false)}>Close</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Create Account Modal */}
       {showCreateAccount && (
         <div className="modal">
           <div className="modal-content">
@@ -139,9 +143,9 @@ export default function LoginPage() {
             <p className="info-text">
               Our Customer Service Team will contact you for further details, or visit our nearest branch.
               <br />
-              Email Us on: info@mortgageportal.com
+              Email Us on: <strong>info@mortgageportal.com</strong>
               <br />
-              Telephone: +254723461757
+              Telephone: <strong>+254723461757</strong>
             </p>
             <div className="modal-actions">
               <button onClick={handleCreateAccount}>Submit</button>

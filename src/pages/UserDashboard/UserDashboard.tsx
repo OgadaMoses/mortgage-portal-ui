@@ -17,8 +17,9 @@ export default function UserDashboard() {
   const [applications, setApplications] = useState<LoanApplication[]>([]);
   const navigate = useNavigate();
 
-  const username = localStorage.getItem('username') || 'User';
-  const lastLogin = localStorage.getItem('lastLogin') || 'First time login';
+  const username = localStorage.getItem('username') ?? 'User';
+  const userId = localStorage.getItem('useridentificationnumber') ?? 'Unknown';
+  const lastLogin = localStorage.getItem('lastLogin') ?? 'First time login';
 
   useEffect(() => {
     const mockData: LoanApplication[] = [
@@ -59,7 +60,8 @@ export default function UserDashboard() {
       <main className="dashboard-content">
         <div className="top-bar">
           <div className="user-info">
-            Logged in as <strong>{username}</strong> • Last login: {lastLogin}
+            <div><strong>{username}</strong> ({userId})</div>
+            <div>Last login: {lastLogin}</div>
           </div>
           <button className="logout-btn" onClick={handleLogout}>
             🔓 Logout

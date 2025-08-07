@@ -130,25 +130,7 @@ export default function AdminPanel() {
               onClick={() => setActivePage("approved")}
             >
               <FaCheckCircle className="menu-icon" /> Approved Items
-            </li>
-            <li
-              className={activePage === "roles" ? "active" : ""}
-              onClick={() => setActivePage("roles")}
-            >
-              <FaUserShield className="menu-icon" /> Roles
-            </li>
-            <li
-              className={activePage === "menuRoles" ? "active" : ""}
-              onClick={() => setActivePage("menuRoles")}
-            >
-              <FaSitemap className="menu-icon" /> Menu Role Mappings
-            </li>
-            <li
-              className={activePage === "adminMappings" ? "active" : ""}
-              onClick={() => setActivePage("adminMappings")}
-            >
-              <FaUsersCog className="menu-icon" /> Admin User Mappings
-            </li>
+            </li>        
             <li
               className={activePage === "addUser" ? "active" : ""}
               onClick={() => setActivePage("addUser")}
