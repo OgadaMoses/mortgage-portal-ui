@@ -33,7 +33,6 @@ const AdminUserMapping: React.FC = () => {
 
   const handleAssign = () => {
     console.log('Assigning users:', selectedUserIds, 'to Admin:', selectedAdminId);
-    // You'll implement the API call here later
   };
 
   const toggleUserSelection = (userId: string) => {

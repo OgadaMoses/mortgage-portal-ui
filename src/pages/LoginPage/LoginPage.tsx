@@ -40,14 +40,12 @@ export default function LoginPage() {
       const result = await response.json();
       console.log('Login successful:', result);
 
-      // Store all relevant data
       localStorage.setItem('authToken', result.token);
       localStorage.setItem('role', result.role);
       localStorage.setItem('username', result.username);
       localStorage.setItem('useridentificationnumber', result.useridentificationnumber);
       localStorage.setItem('lastLogin', new Date().toLocaleString());
 
-      // Redirect based on role
       if (result.role === '01') {
         window.location.href = '/admin';
       } else if (result.role === '02') {
@@ -97,7 +95,6 @@ export default function LoginPage() {
         </div>
       </form>
 
-      {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div className="modal">
           <div className="modal-content">
@@ -117,7 +114,6 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Create Account Modal */}
       {showCreateAccount && (
         <div className="modal">
           <div className="modal-content">

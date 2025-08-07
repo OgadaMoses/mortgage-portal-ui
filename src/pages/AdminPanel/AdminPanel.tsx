@@ -258,7 +258,6 @@ export default function AdminPanel() {
     </div>
   </div>
 )}
-
       </main>
     </div>
   );

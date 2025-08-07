@@ -1,4 +1,3 @@
-// src/components/SuccessPopup.tsx
 import React, { useEffect, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 
