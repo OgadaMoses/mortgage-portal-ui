@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
 import "./AdminPanel.css";
 
@@ -88,21 +89,53 @@ export default function AdminPanel() {
     navigate("/login");
   };
 
-  const handleDecision = (status: "Approved" | "Rejected") => {
-    if (!selectedApp) return;
-    if (!decisionReason && status === "Rejected") {
-      alert("Please provide a reason for rejection.");
-      return;
-    }
+    const handleDecision = async (status: "Approved" | "Rejected") => {
+      if (!selectedApp) {
+        toast.error("No loan application selected.");
+        return;
+      }
 
-    setApplications((prev) =>
-      prev.map((app) => (app.id === selectedApp.id ? { ...app, status } : app))
-    );
+      if (status === "Rejected" && !decisionReason.trim()) {
+        toast.warning("Please provide a reason for rejection.");
+        return;
+      }
 
-    setSelectedApp(null);
-    setDecisionReason("");
-    alert(`Application ${status}`);
-  };
+      const checkerId = localStorage.getItem("useridentificationnumber");
+
+      if (!checkerId) {
+        toast.error("Checker ID not found. Please log in again.");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/loans/${selectedApp.id}/decision?status=${status.toUpperCase()}&checkerId=${checkerId}`,
+          {
+            method: "PUT",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to update loan status.");
+        }
+
+        setApplications((prevApps) =>
+          prevApps.map((app) =>
+            app.id === selectedApp.id ? { ...app, status: status.toUpperCase() } : app
+          )
+        );
+
+        setSelectedApp(null);
+        setDecisionReason(""); // reset
+
+        toast.success(`✅ Loan ${status} successfully!`);
+
+      } catch (error) {
+        console.error("Error updating loan status:", error);
+        toast.error("Something went wrong while updating loan status.");
+      }
+    };
+
 
   const filteredApplications = applications;
 
