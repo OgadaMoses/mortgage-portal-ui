@@ -33,7 +33,7 @@ A React (or Angular/Vue) frontend for the Mortgage Application Portal, providing
 
 ##  Technology Stack
 
-- **Framework**: React 
+- **Framework**: React + TypeScript
 - **State Management**: Redux  
 - **Styling**: Tailwind CSS / Bootstrap / Material UI  
 - **HTTP Requests**: Axios / Fetch API  
